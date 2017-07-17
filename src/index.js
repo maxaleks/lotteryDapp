@@ -1,8 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import { Router, Route } from 'react-router';
+import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
+import thunk from 'redux-thunk';
+import { BrowserRouter } from 'react-router-dom';
 
-ReactDOM.render(<App />, document.getElementById('root'));
-registerServiceWorker();
+import './css/main.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
+
+import reducers from './reducers';
+import getRoutes from './routes';
+
+const middleware = [thunk];
+
+// Add the reducer to your store on the `routing` key
+const store = createStore(
+  combineReducers({
+    ...reducers,
+    routing: routerReducer
+  }),
+  applyMiddleware(...middleware),
+);
+
+ReactDOM.render(
+  <Provider store={store}>
+    { /* Tell the Router to use our enhanced history */ }
+    <BrowserRouter>
+      {getRoutes(store)}
+    </BrowserRouter>
+  </Provider>,
+  document.getElementById('root')
+);
